@@ -1,18 +1,6 @@
 """
 model.py — Time-LightGCN, mul 모드 구현
 담당: 이하람 (mul 분기 + sanity check 기준선 vanilla)
-
-팀 담당 구분:
-  vanilla  — 기준선. mul 검증(sanity_check)의 기준점으로 여기 포함.
-  mul      — 본인 담당. exp(-λ·dt_days)를 엣지 가중치로 곱하는 방식.
-  add      — 김현도 담당. 이 파일에는 자리만 열어둠(NotImplementedError).
-
-설계 원칙 (조은서 데이터셋 README 기반):
-  - dt_days: 일 단위 Δt. 값이 작을수록 최근. 유저별 train 마지막 시각 기준.
-  - t_ref 별도 계산 불필요. dt_days를 직접 exp에 넣으면 됨.
-  - λ 초기값=0 → exp(-0·dt)=1 → vanilla와 동일 지점에서 학습 시작.
-  - λ 부호 제약 없음 → 음수로 수렴하면 가설 스스로 반증됨.
-  - 게이트 곱한 뒤 차수(degree)를 반드시 재계산해서 정규화.
 """
 
 import torch
@@ -47,7 +35,6 @@ class TimeLightGCN(nn.Module):
             self.lam = nn.Parameter(torch.zeros(1))
 
         if mode == "add":
-            # 김현도 담당. 파라미터 자리만 비워둠.
             pass
 
     def _compute_edge_weight(self, dt_days):
@@ -88,8 +75,6 @@ class TimeLightGCN(nn.Module):
 
         elif self.mode == "add":
             raise NotImplementedError(
-                "add 모드는 김현도 담당입니다. "
-                "이 분기에 add 로직을 구현하거나 별도 메서드로 교체해주세요."
             )
 
         # ── 정규화: 가중치 곱한 뒤 차수 재계산 (핵심 버그 방지) ─
